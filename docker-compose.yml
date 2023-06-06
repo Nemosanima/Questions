@@ -10,10 +10,11 @@ services:
     env_file:
       - ./.env
 
-
   backend:
     image: nemosanima/backend_api:latest
     restart: always
+    volumes:
+      - counter_data:/app/data
     depends_on:
       - db
     env_file:
@@ -30,5 +31,6 @@ services:
 
 
 volumes:
+  counter_data:
   postgres_data:
     external: false
