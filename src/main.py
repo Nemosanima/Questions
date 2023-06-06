@@ -1,6 +1,7 @@
 import requests
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from typing import Optional
 
 from . import models, schemas
 from .database import engine, SessionLocal
@@ -51,7 +52,7 @@ def question_exists(db, question_id):
     return db.query(models.Question).filter_by(question_id=question_id).first()
 
 
-@app.post('/questions', tags=['Questions number'])
+@app.post('/questions', response_model=Optional[schemas.QuestionResponse], tags=['Questions number'])
 def create_questions(data: schemas.Question, db: Session = Depends(get_db)):
     global counter
 
