@@ -15,7 +15,7 @@ app = FastAPI(
 )
 
 
-def get_db():
+def get_db() -> Session:
     db = SessionLocal()
     try:
         yield db
@@ -23,17 +23,17 @@ def get_db():
         db.close()
 
 
-volume_path = '/app/data/counter.txt'
-link = 'https://jservice.io/api/random?count=1'
-error_message = 'Не удалось получить данные для вопроса'
+volume_path: str = '/app/data/counter.txt'
+link: str = 'https://jservice.io/api/random?count=1'
+error_message: str = 'Не удалось получить данные для вопроса'
 
 
-def save_counter(counter):
+def save_counter(counter: int) -> None:
     with open(volume_path, 'w') as file:
         file.write(str(counter))
 
 
-def load_counter():
+def load_counter() -> int:
     if os.path.exists(volume_path):
         with open(volume_path, 'r') as file:
             counter = int(file.read())
@@ -42,10 +42,10 @@ def load_counter():
         return 0
 
 
-counter = load_counter()
+counter: int = load_counter()
 
 
-def get_question():
+def get_question() -> Optional[dict]:
     response = requests.get(link).json()
     if response:
         question_id = response[0]['id']
@@ -55,7 +55,7 @@ def get_question():
     return None
 
 
-def save_question_to_db(db, question_id, question, answer):
+def save_question_to_db(db: Session, question_id: int, question: str, answer: str) -> None:
     new_question = models.Question(
         question_id=question_id,
         question=question,
@@ -66,12 +66,12 @@ def save_question_to_db(db, question_id, question, answer):
     db.refresh(new_question)
 
 
-def question_exists(db, question_id):
+def question_exists(db, question_id) -> Optional[models.Question]:
     return db.query(models.Question).filter_by(question_id=question_id).first()
 
 
 @app.post('/questions', response_model=Optional[schemas.QuestionResponse], tags=['Questions number'])
-def create_questions(data: schemas.Question, db: Session = Depends(get_db)):
+def create_questions(data: schemas.Question, db: Session = Depends(get_db)) -> Optional[models.Question]:
     global counter
 
     for _ in range(data.questions_num):

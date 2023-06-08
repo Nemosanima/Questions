@@ -11,7 +11,9 @@ services:
       - ./.env
 
   backend:
-    image: nemosanima/backend_api:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - counter_data:/app/data
